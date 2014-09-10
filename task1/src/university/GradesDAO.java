@@ -2,6 +2,7 @@ package university;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -17,6 +18,7 @@ public class GradesDAO {
     dropTable(t);
     createTable(t);
     insertStudent(t, "Ben", 50, 50, 50, 50);
+    System.out.println(selectStudent(t, 1));
 
   }
 
@@ -47,6 +49,37 @@ public class GradesDAO {
   public void dropTable(String tableName) throws SQLException {
     String query = "drop table if exists " + this.db + "." + tableName;
     runUpdate(query);
+  }
+
+  public Student selectStudent(String tableName, int id) throws SQLException {
+    String query = "select id, name, grade1, grade2, grade3, gradeExam from "
+      + tableName + " where id=?";
+
+    System.out.println(query);
+
+    PreparedStatement s = null;
+    ResultSet r = null;
+    Student student = null;
+    try {
+      s = connection.prepareStatement(query);
+      s.setInt(1, id);
+      r = s.executeQuery();
+
+      String name = r.getString("name");
+      int grade1 = r.getInt("grade1");
+      int grade2 = r.getInt("grade2");
+      int grade3 = r.getInt("grade3");
+      int gradeExam = r.getInt("gradeExam");
+
+      student = new Student(id, name, grade1, grade2, grade3, gradeExam);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } finally {
+      if (s != null) {
+        s.close();
+      }
+    }
+    return student;
   }
 
   public void runUpdate(String query) throws SQLException {
