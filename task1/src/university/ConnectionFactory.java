@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class connectionFactory {
+public class ConnectionFactory {
 
   public static Connection getHardCodedConnection() throws SQLException {
     return getConnection("user", "password", "localhost", "3306", "grades");
