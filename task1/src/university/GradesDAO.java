@@ -1,3 +1,6 @@
+//TODO:
+//move column names to Student object
+
 package university;
 
 import java.sql.Connection;
@@ -5,6 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GradesDAO {
   private Connection connection;
@@ -18,11 +24,12 @@ public class GradesDAO {
     dropTable(t);
     createTable(t);
     insertStudent(t, "Ben", 50, 50, 50, 50);
-    System.out.println(selectStudent(t, 1));
+    System.out.println(selectStudentById(t, 1)[0]);
   }
 
   public void insertStudent(String tableName, String name, int grade1,
       int grade2, int grade3, int gradeExam) throws SQLException {
+
 
     PreparedStatement s = null;
     try {
@@ -50,29 +57,34 @@ public class GradesDAO {
     runUpdate(query);
   }
 
-  public Student selectStudent(String tableName, int id) throws SQLException {
+  public Student[] selectStudentById(String tableName, int id) throws SQLException {
+    return selectStudent(tableName, "id", id, java.sql.Types.INTEGER);
+  }
+
+  public Student[] selectStudent(String tableName, String column, Object value, int type) throws SQLException {
     String query = "select id, name, grade1, grade2, grade3, gradeExam from "
-      + tableName + " where id=?";
+      + tableName + " where " + column + "=?";
 
     System.out.println(query);
 
     PreparedStatement s = null;
     ResultSet r = null;
-    Student student = null;
+    List<Student> students = new ArrayList<Student>();
     try {
       s = connection.prepareStatement(query);
-      s.setInt(1, id);
+      s.setObject(1, value, type);
       r = s.executeQuery();
 
-      r.next();
+      while(r.next()) {
+        int id = r.getInt("id");
+        String name = r.getString("name");
+        int grade1 = r.getInt("grade1");
+        int grade2 = r.getInt("grade2");
+        int grade3 = r.getInt("grade3");
+        int gradeExam = r.getInt("gradeExam");
 
-      String name = r.getString("name");
-      int grade1 = r.getInt("grade1");
-      int grade2 = r.getInt("grade2");
-      int grade3 = r.getInt("grade3");
-      int gradeExam = r.getInt("gradeExam");
-
-      student = new Student(id, name, grade1, grade2, grade3, gradeExam);
+        students.add(new Student(id, name, grade1, grade2, grade3, gradeExam));
+      }
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
@@ -80,7 +92,7 @@ public class GradesDAO {
         s.close();
       }
     }
-    return student;
+    return students.toArray(new Student[students.size()]);
   }
 
   public void runUpdate(String query) throws SQLException {
