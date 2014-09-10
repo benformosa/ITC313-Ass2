@@ -19,7 +19,6 @@ public class GradesDAO {
     createTable(t);
     insertStudent(t, "Ben", 50, 50, 50, 50);
     System.out.println(selectStudent(t, 1));
-
   }
 
   public void insertStudent(String tableName, String name, int grade1,
@@ -64,6 +63,8 @@ public class GradesDAO {
       s = connection.prepareStatement(query);
       s.setInt(1, id);
       r = s.executeQuery();
+
+      r.next();
 
       String name = r.getString("name");
       int grade1 = r.getInt("grade1");

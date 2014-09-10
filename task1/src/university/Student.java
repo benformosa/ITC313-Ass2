@@ -23,6 +23,10 @@ public class Student {
     this.gradeExam = gradeExam;
   }
 
+  public String toString() {
+      return String.format("%d %s - %d, %d, %d, %d : %d", id, name, grade1, grade2, grade3, gradeExam, getFinalGrade());
+  }
+
   public int getFinalGrade() {
     return (grade1 / 100 * grade1Weight) + (grade2 / 100 * grade2Weight)
         + (grade3 / 100 * grade3Weight) + (gradeExam / 100 * gradeExamWeight);
