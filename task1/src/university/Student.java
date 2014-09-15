@@ -6,12 +6,12 @@ public class Student {
   private static final int grade3Weight = 20;
   private static final int gradeExamWeight = 50;
 
-  int id;
-  String name;
-  int grade1;
-  int grade2;
-  int grade3;
-  int gradeExam;
+  public int id;
+  public String name;
+  public int grade1;
+  public int grade2;
+  public int grade3;
+  public int gradeExam;
 
   public Student(int id, String name, int grade1, int grade2, int grade3,
       int gradeExam) {
@@ -24,11 +24,12 @@ public class Student {
   }
 
   public String toString() {
-      return String.format("%d %s - %d, %d, %d, %d : %d", id, name, grade1, grade2, grade3, gradeExam, getFinalGrade());
+    return String.format("%d %s - %d, %d, %d, %d : %d", id, name, grade1,
+        grade2, grade3, gradeExam, getFinalGrade());
   }
 
   public int getFinalGrade() {
     return (grade1 / 100 * grade1Weight) + (grade2 / 100 * grade2Weight)
-        + (grade3 / 100 * grade3Weight) + (gradeExam / 100 * gradeExamWeight);
+      + (grade3 / 100 * grade3Weight) + (gradeExam / 100 * gradeExamWeight);
   }
 }
