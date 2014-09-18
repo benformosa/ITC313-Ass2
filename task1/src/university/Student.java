@@ -6,6 +6,13 @@ public class Student {
   private static final int grade3Weight = 20;
   private static final int gradeExamWeight = 50;
 
+  public static final String columnName = "name";
+  public static final String columnId = "id";
+  public static final String columnGrade1 = "grade1";
+  public static final String columnGrade2 = "grade2";
+  public static final String columnGrade3 = "grade3";
+  public static final String columnGradeExam = "gradeExam";
+
   public int id;
   public String name;
   public int grade1;
