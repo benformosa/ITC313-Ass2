@@ -1,0 +1,30 @@
+<project name="speed.MultiSpeed" basedir="." default="main">
+  <property name="src.dir" value="src" />
+  <property name="build.dir" value="bin" />
+  <property name="lib.dir" value="/usr/share/java" />
+  <property name="main-class"  value="speed.MultiSpeed" />
+
+  <path id="classpath">
+  </path>
+	
+  <target name="clean">
+    <delete dir="${build.dir}" />
+  </target>
+
+  <target name="compile">
+    <mkdir dir="${build.dir}" />
+    <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" classpathref="classpath" />
+  </target>
+
+  <target name="run" depends="compile">
+    <java classname="${ant.project.name}" fork="true">
+      <classpath>
+        <path refid="classpath" />
+        <path location="${build.dir}" />
+      </classpath>
+    </java>
+  </target>
+
+  <target name="clean-build" depends="clean,compile" />
+  <target name="main" depends="clean,run" />
+</project>
