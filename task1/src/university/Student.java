@@ -30,6 +30,11 @@ public class Student {
     this.gradeExam = gradeExam;
   }
 
+  public static String[] getColumns() {
+    return new String[] { columnName, columnId, columnGrade1, columnGrade2,
+        columnGrade3, columnGradeExam };
+  }
+
   public String toString() {
     return String.format("%d %s - %d, %d, %d, %d : %d", id, name, grade1,
         grade2, grade3, gradeExam, getFinalGrade());

@@ -9,12 +9,10 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class ConnectionFactory {
-  public static final String defaultPropertiesFileName = "db.properties";
 
-  public static Connection getConnection() throws IOException, SQLException {
-    return getPropertiesFileConnection(defaultPropertiesFileName);
-  }
-
+  /*
+   * Create a new connection given the database server details.
+   */
   public static Connection getConnection(String user, String password,
       String server, String port, String db) throws SQLException {
     Connection connection = null;
@@ -34,6 +32,16 @@ public class ConnectionFactory {
 
     return connection;
   }
+
+  /*
+   * Create a new connection given a properties file containing the database
+   * server details. Properties file format:
+   */
+  // user=username
+  // password=verysecret
+  // server=localhost
+  // port=3306
+  // database=databasename
 
   public static Connection getPropertiesFileConnection(String fileName)
       throws IOException, SQLException {

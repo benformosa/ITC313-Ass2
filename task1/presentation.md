@@ -21,7 +21,7 @@ Actions which GradingTool supports:
 
 # Pre-requisites
 
-* MySQL installed
+* MySQL
 
 # How to run
 
