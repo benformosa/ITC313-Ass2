@@ -1,6 +1,7 @@
 package university;
 
 public class Student {
+  private static final int max = 100;
   private static final int grade1Weight = 10;
   private static final int grade2Weight = 20;
   private static final int grade3Weight = 20;

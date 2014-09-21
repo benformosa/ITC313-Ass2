@@ -87,6 +87,11 @@ public class GradesDAO {
     runUpdate(query);
   }
 
+  public Student[] selectAll(String tableName) throws SQLException {
+    return selectStudent(tableName, Student.columnId, 0,
+        java.sql.Types.INTEGER, ">");
+  }
+
   /*
    * Get the Student with the given id from the given table Returns null if no
    * student has that id
