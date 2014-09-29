@@ -3,10 +3,13 @@ title: ITC313-Assignment 1 Task 1
 author: Ben Formosa 11429074
 header-includes:
     - \usepackage{fancyhdr}
+    - \usepackage{placeins}
     - \pagestyle{fancy}
     - \fancyfoot[L]{Ben Formosa 11429074}
     - \fancyfoot[C]{\thepage}
 ---
+
+<!-- pandoc readme.md -o readme.pdf -f markdown+auto_identifiers -s -V papersize:"a4paper" -->
 
 # Overview
 

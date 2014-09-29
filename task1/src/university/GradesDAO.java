@@ -32,12 +32,39 @@ public class GradesDAO {
   }
 
   /*
-   * Insert the given Student to the given Table
+   * Create table for student grades with a given name.
    */
-  public void insertStudent(String tableName, Student student)
-      throws SQLException {
-    insertStudent(tableName, student.name, student.grade1, student.grade2,
-        student.grade3, student.gradeExam);
+  public void createTable(String tableName) throws SQLException {
+    String query = "create table " + this.db + "." + tableName + " ("
+      + Student.columnId + " integer not null auto_increment, "
+      + Student.columnName + " varchar(40) not null, " + Student.columnGrade1
+      + " integer not null, " + Student.columnGrade2 + " integer not null, "
+      + Student.columnGrade3 + " integer not null," + Student.columnGradeExam
+      + " integer not null, " + "primary key (" + Student.columnId + "))";
+    runUpdate(query);
+
+    query = "alter table " + tableName + " auto_increment = 1";
+    runUpdate(query);
+  }
+
+  /*
+   * Drop the given table
+   */
+  public void dropTable(String tableName) throws SQLException {
+    String query = "drop table if exists " + this.db + "." + tableName;
+    runUpdate(query);
+  }
+
+  public String[] getTables() throws SQLException {
+    List<String> tables = new ArrayList<String>();
+
+    DatabaseMetaData md = connection.getMetaData();
+    ResultSet r = md.getTables(null, null, "%", null);
+    while (r.next()) {
+      tables.add(r.getString(3));
+    }
+
+    return tables.toArray(new String[tables.size()]);
   }
 
   /*
@@ -67,92 +94,37 @@ public class GradesDAO {
     }
   }
 
-  public String[] getTables() throws SQLException {
-    List<String> tables = new ArrayList<String>();
-
-    DatabaseMetaData md = connection.getMetaData();
-    ResultSet r = md.getTables(null, null, "%", null);
-    while (r.next()) {
-      tables.add(r.getString(3));
-    }
-
-    return tables.toArray(new String[tables.size()]);
+  /*
+   * Insert the given Student to the given Table
+   */
+  public void insertStudent(String tableName, Student student)
+      throws SQLException {
+    insertStudent(tableName, student.name, student.grade1, student.grade2,
+        student.grade3, student.gradeExam);
   }
 
   /*
-   * Drop the given table
+   * Run an update query (i.e. no return value) with the given query string
    */
-  public void dropTable(String tableName) throws SQLException {
-    String query = "drop table if exists " + this.db + "." + tableName;
-    runUpdate(query);
+  public void runUpdate(String query) throws SQLException {
+    // System.out.println(query);
+
+    Statement s = null;
+    try {
+      s = connection.createStatement();
+      s.executeUpdate(query);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } finally {
+      if (s != null) {
+        s.close();
+      }
+    }
   }
 
   public Student[] selectAll(String tableName) throws SQLException {
     return selectStudent(tableName, Student.columnId, 0,
         java.sql.Types.INTEGER, ">");
-  }
-
-  /*
-   * Get the Student with the given id from the given table Returns null if no
-   * student has that id
-   */
-  public Student selectStudentById(String tableName, int id)
-      throws SQLException {
-    Student student = null;
-    try {
-      student = selectStudent(tableName, "id", id, java.sql.Types.INTEGER)[0];
-    } catch (ArrayIndexOutOfBoundsException ex) {
-      System.err.println("No student with ID " + id + " found in table "
-        + tableName);
-    }
-    return student;
-  }
-
-  /*
-   * Get Students with the given name
-   */
-  public Student[] selectStudentByName(String tableName, String name)
-      throws SQLException {
-    return selectStudent(tableName, Student.columnName, name,
-        java.sql.Types.VARCHAR);
-  }
-
-  /*
-   * Get Students with matching name
-   */
-  public Student[] selectStudentLikeName(String tableName, String name)
-      throws SQLException {
-    return selectStudent(tableName, Student.columnName, name,
-        java.sql.Types.VARCHAR, "like");
-  }
-
-  /*
-   * Select students with grade = value grade is the number of the grade: 1:
-   * grade1 2: grade2 3: grade3 4: gradeExam
-   */
-  public Student[] selectStudentByGrade(String tableName, int grade, int value,
-      String operator) throws SQLException {
-    if (grade >= 1 && grade <= 4) {
-      String which = null;
-      switch (grade) {
-        case 1:
-          which = Student.columnGrade1;
-          break;
-        case 2:
-          which = Student.columnGrade2;
-          break;
-        case 3:
-          which = Student.columnGrade3;
-          break;
-        case 4:
-          which = Student.columnGradeExam;
-          break;
-      }
-      return selectStudent(tableName, which, value, java.sql.Types.INTEGER,
-          operator);
-    } else {
-      return null;
-    }
   }
 
   /*
@@ -205,37 +177,65 @@ public class GradesDAO {
   }
 
   /*
-   * Run an update query (i.e. no return value) with the given query string
+   * Select students with grade = value grade is the number of the grade: 1:
+   * grade1 2: grade2 3: grade3 4: gradeExam
    */
-  public void runUpdate(String query) throws SQLException {
-    // System.out.println(query);
-
-    Statement s = null;
-    try {
-      s = connection.createStatement();
-      s.executeUpdate(query);
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      if (s != null) {
-        s.close();
+  public Student[] selectStudentByGrade(String tableName, int grade, int value,
+      String operator) throws SQLException {
+    if (grade >= 1 && grade <= 4) {
+      String which = null;
+      switch (grade) {
+        case 1:
+          which = Student.columnGrade1;
+          break;
+        case 2:
+          which = Student.columnGrade2;
+          break;
+        case 3:
+          which = Student.columnGrade3;
+          break;
+        case 4:
+          which = Student.columnGradeExam;
+          break;
       }
+      return selectStudent(tableName, which, value, java.sql.Types.INTEGER,
+          operator);
+    } else {
+      return null;
     }
   }
 
   /*
-   * Create table for student grades with a given name.
+   * Get the Student with the given id from the given table Returns null if no
+   * student has that id
    */
-  public void createTable(String tableName) throws SQLException {
-    String query = "create table " + this.db + "." + tableName + " ("
-      + Student.columnId + " integer not null auto_increment, "
-      + Student.columnName + " varchar(40) not null, " + Student.columnGrade1
-      + " integer not null, " + Student.columnGrade2 + " integer not null, "
-      + Student.columnGrade3 + " integer not null," + Student.columnGradeExam
-      + " integer not null, " + "primary key (" + Student.columnId + "))";
-    runUpdate(query);
+  public Student selectStudentById(String tableName, int id)
+      throws SQLException {
+    Student student = null;
+    try {
+      student = selectStudent(tableName, "id", id, java.sql.Types.INTEGER)[0];
+    } catch (ArrayIndexOutOfBoundsException ex) {
+      System.err.println("No student with ID " + id + " found in table "
+        + tableName);
+    }
+    return student;
+  }
 
-    query = "alter table " + tableName + " auto_increment = 1";
-    runUpdate(query);
+  /*
+   * Get Students with the given name
+   */
+  public Student[] selectStudentByName(String tableName, String name)
+      throws SQLException {
+    return selectStudent(tableName, Student.columnName, name,
+        java.sql.Types.VARCHAR);
+  }
+
+  /*
+   * Get Students with matching name
+   */
+  public Student[] selectStudentLikeName(String tableName, String name)
+      throws SQLException {
+    return selectStudent(tableName, Student.columnName, name,
+        java.sql.Types.VARCHAR, "like");
   }
 }

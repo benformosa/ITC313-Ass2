@@ -5,6 +5,8 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -13,44 +15,47 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 
 public class GradingTool implements ActionListener {
-  private JFrame frame;
-  private JPanel panel;
-  private String currentTable;
-  private GradesDAO g;
-
-  private String[] operators = new String[] { "<", "<=", "=", ">=", ">", "like" };
-
-  private JLabel currentTableLabel;
-  private JButton changeTableButton;
-  private JComboBox<String> changeTableCBox;
-  private DefaultComboBoxModel<String> changeTableCBoxModel;
-  private JButton dropTableButton;
-  private JTextField newTableText;
-  private JButton newTableButton;
-
-  private JTextField insertNameText;
-  private JTextField insertGrade1Text;
-  private JTextField insertGrade2Text;
-  private JTextField insertGrade3Text;
-  private JTextField insertGradeExamText;
-  private JButton insertButton;
-  private DefaultComboBoxModel<String> selectColumnCBoxModel;
-  private JComboBox<String> selectColumnCBox;
-  private DefaultComboBoxModel<String> selectOperatorCBoxModel;
-  private JComboBox<String> selectOperatorCBox;
-  private JTextField selectValueText;
-  private JButton selectButton;
-  private JPanel selectOutput;
-
   public static void main(String[] args) throws SQLException, IOException,
       URISyntaxException {
     @SuppressWarnings("unused")
     GradingTool gt = new GradingTool();
   }
+
+  private JButton changeTableButton;
+  private JComboBox<String> changeTableCBox;
+  private DefaultComboBoxModel<String> changeTableCBoxModel;
+
+  private String currentTable;
+
+  private JLabel currentTableLabel;
+  private JButton dropTableButton;
+  private JFrame frame;
+  private GradesDAO g;
+  private JButton insertButton;
+  private JTextField insertGrade1Text;
+  private JTextField insertGrade2Text;
+
+  private JTextField insertGrade3Text;
+  private JTextField insertGradeExamText;
+  private JTextField insertNameText;
+  private JButton newTableButton;
+  private JTextField newTableText;
+  private String[] operators = new String[] { "<", "<=", "=", ">=", ">", "like" };
+  private JPanel panel;
+  private JButton selectButton;
+  private JComboBox<String> selectColumnCBox;
+  private DefaultComboBoxModel<String> selectColumnCBoxModel;
+  private JComboBox<String> selectOperatorCBox;
+  private DefaultComboBoxModel<String> selectOperatorCBoxModel;
+  private JPanel selectOutput;
+
+  private JTextField selectValueText;
 
   public GradingTool() throws SQLException, IOException, URISyntaxException {
     g = new GradesDAO();
@@ -105,15 +110,15 @@ public class GradingTool implements ActionListener {
     insertButton.addActionListener(this);
 
     insertPanel.add(new JLabel("Insert"));
-    insertPanel.add(new JLabel("Name"));
+    insertPanel.add(new JLabel(Student.printName));
     insertPanel.add(insertNameText);
-    insertPanel.add(new JLabel("Grade 1"));
+    insertPanel.add(new JLabel(Student.printGrade1));
     insertPanel.add(insertGrade1Text);
-    insertPanel.add(new JLabel("Grade 2"));
+    insertPanel.add(new JLabel(Student.printGrade2));
     insertPanel.add(insertGrade2Text);
-    insertPanel.add(new JLabel("Grade 3"));
+    insertPanel.add(new JLabel(Student.printGrade3));
     insertPanel.add(insertGrade3Text);
-    insertPanel.add(new JLabel("Exam Grade"));
+    insertPanel.add(new JLabel(Student.printGradeExam));
     insertPanel.add(insertGradeExamText);
     insertPanel.add(insertButton);
 
@@ -270,9 +275,21 @@ public class GradingTool implements ActionListener {
   public void updateSelected(Student[] selected) {
     try {
       selectOutput.removeAll();
+
+      // convert array of students to [][] of student data
+      List<Object[]> list = new ArrayList<Object[]>();
       for (Student s : selected) {
-        selectOutput.add(new StudentPanel(s));
+        list.add(s.toArray());
       }
+
+      // display data in a JTable
+      JTable table = new JTable(list.toArray(new Object[list.size()][]),
+          Student.getPrintColumns());
+
+      table.setAutoCreateRowSorter(true);
+      JScrollPane scrollPane = new JScrollPane(table);
+      selectOutput.add(scrollPane);
+
       selectOutput.validate();
     } catch (NullPointerException ex) {
     }

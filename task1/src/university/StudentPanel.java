@@ -6,8 +6,8 @@ import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
 public class StudentPanel extends JPanel {
-  Student student;
   JButton dropStudentButton;
+  Student student;
 
   public StudentPanel(Student student) {
     super();

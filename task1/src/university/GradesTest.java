@@ -12,9 +12,6 @@ package university;
 // Student
 
 public class GradesTest {
-  public GradesTest() {
-  }
-
   public static void main(String[] args) {
     GradesDAO g;
     try {
@@ -47,5 +44,8 @@ public class GradesTest {
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  public GradesTest() {
   }
 }
