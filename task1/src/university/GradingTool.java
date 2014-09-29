@@ -287,9 +287,10 @@ public class GradingTool implements ActionListener {
           Student.getPrintColumns());
 
       table.setAutoCreateRowSorter(true);
+      table.setPreferredScrollableViewportSize(table.getPreferredSize());
+      table.setFillsViewportHeight(true);
       JScrollPane scrollPane = new JScrollPane(table);
       selectOutput.add(scrollPane);
-
       selectOutput.validate();
     } catch (NullPointerException ex) {
     }
