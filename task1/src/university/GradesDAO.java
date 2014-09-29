@@ -14,7 +14,7 @@ import java.util.List;
 public class GradesDAO {
   public static final String defaultPropertiesFileName = "db.properties";
   private Connection connection;
-  private String db;
+  public String db;
 
   /*
    * Create a new GradesDAO using the default properties file.
@@ -107,8 +107,6 @@ public class GradesDAO {
    * Run an update query (i.e. no return value) with the given query string
    */
   public void runUpdate(String query) throws SQLException {
-    // System.out.println(query);
-
     Statement s = null;
     try {
       s = connection.createStatement();
@@ -146,33 +144,25 @@ public class GradesDAO {
       + Student.columnGrade3 + "," + Student.columnGradeExam + " from "
       + tableName + " where " + column + " " + operator + " ?";
 
-    System.out.println(query);
-
     PreparedStatement s = null;
     ResultSet r = null;
     List<Student> students = new ArrayList<Student>();
-    try {
-      s = connection.prepareStatement(query);
-      s.setObject(1, value, type);
-      r = s.executeQuery();
 
-      while (r.next()) {
-        int id = r.getInt(Student.columnId);
-        String name = r.getString(Student.columnName);
-        int grade1 = r.getInt(Student.columnGrade1);
-        int grade2 = r.getInt(Student.columnGrade2);
-        int grade3 = r.getInt(Student.columnGrade3);
-        int gradeExam = r.getInt(Student.columnGradeExam);
+    s = connection.prepareStatement(query);
+    s.setObject(1, value, type);
+    r = s.executeQuery();
 
-        students.add(new Student(id, name, grade1, grade2, grade3, gradeExam));
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      if (s != null) {
-        s.close();
-      }
+    while (r.next()) {
+      int id = r.getInt(Student.columnId);
+      String name = r.getString(Student.columnName);
+      int grade1 = r.getInt(Student.columnGrade1);
+      int grade2 = r.getInt(Student.columnGrade2);
+      int grade3 = r.getInt(Student.columnGrade3);
+      int gradeExam = r.getInt(Student.columnGradeExam);
+
+      students.add(new Student(id, name, grade1, grade2, grade3, gradeExam));
     }
+
     return students.toArray(new Student[students.size()]);
   }
 

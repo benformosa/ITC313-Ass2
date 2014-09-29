@@ -1,13 +1,17 @@
 package university;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -16,9 +20,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.border.BevelBorder;
 
 public class GradingTool implements ActionListener {
   public static void main(String[] args) throws SQLException, IOException,
@@ -27,34 +31,34 @@ public class GradingTool implements ActionListener {
     GradingTool gt = new GradingTool();
   }
 
+  private GradesDAO g;
+  private String currentTable;
+  private JFrame frame;
+  private JPanel panel;
+  private JLabel statusLabel;
+
   private JButton changeTableButton;
   private JComboBox<String> changeTableCBox;
   private DefaultComboBoxModel<String> changeTableCBoxModel;
-
-  private String currentTable;
-
   private JLabel currentTableLabel;
   private JButton dropTableButton;
-  private JFrame frame;
-  private GradesDAO g;
+  private JButton newTableButton;
+  private JTextField newTableText;
+
   private JButton insertButton;
   private JTextField insertGrade1Text;
   private JTextField insertGrade2Text;
-
   private JTextField insertGrade3Text;
   private JTextField insertGradeExamText;
   private JTextField insertNameText;
-  private JButton newTableButton;
-  private JTextField newTableText;
+
   private String[] operators = new String[] { "<", "<=", "=", ">=", ">", "like" };
-  private JPanel panel;
   private JButton selectButton;
   private JComboBox<String> selectColumnCBox;
   private DefaultComboBoxModel<String> selectColumnCBoxModel;
   private JComboBox<String> selectOperatorCBox;
   private DefaultComboBoxModel<String> selectOperatorCBoxModel;
   private JPanel selectOutput;
-
   private JTextField selectValueText;
 
   public GradingTool() throws SQLException, IOException, URISyntaxException {
@@ -63,14 +67,20 @@ public class GradingTool implements ActionListener {
     frame = new JFrame();
     frame.setTitle("Grading Tool");
     frame.setLocationRelativeTo(null);
+    frame.setPreferredSize(new Dimension(600, 600));
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-    panel = new JPanel();
+    panel = new JPanel(new BorderLayout());
     panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+
+    statusLabel = new JLabel("Loaded database " + g.db);
+    statusLabel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
     // *** Create tablePanel ***
 
     JPanel tablePanel = new JPanel();
+    tablePanel.setBorder(BorderFactory.createTitledBorder(
+        BorderFactory.createEtchedBorder(), "Tables"));
 
     currentTableLabel = new JLabel("Using table " + currentTable);
 
@@ -79,7 +89,6 @@ public class GradingTool implements ActionListener {
 
     changeTableButton = new JButton("Change table");
     changeTableButton.addActionListener(this);
-    changeTableButton.doClick(); // this initialises currentTable
 
     dropTableButton = new JButton("Drop table");
     dropTableButton.addActionListener(this);
@@ -88,18 +97,27 @@ public class GradingTool implements ActionListener {
     newTableButton = new JButton("Create table");
     newTableButton.addActionListener(this);
 
-    tablePanel.add(new JLabel("Tables"));
-    tablePanel.add(currentTableLabel);
-    tablePanel.add(changeTableCBox);
-    tablePanel.add(changeTableButton);
-    tablePanel.add(dropTableButton);
-    tablePanel.add(new JLabel("Create:"));
-    tablePanel.add(newTableText);
-    tablePanel.add(newTableButton);
+    JPanel tablePanel1 = new JPanel();
+    JPanel tablePanel2 = new JPanel();
+    JPanel tablePanel3 = new JPanel();
+
+    tablePanel1.add(currentTableLabel);
+    tablePanel2.add(changeTableCBox);
+    tablePanel2.add(changeTableButton);
+    tablePanel2.add(dropTableButton);
+    tablePanel3.add(new JLabel("Create:"));
+    tablePanel3.add(newTableText);
+    tablePanel3.add(newTableButton);
+
+    tablePanel.add(tablePanel1);
+    tablePanel.add(tablePanel2);
+    tablePanel.add(tablePanel3);
 
     // *** Create insertPanel ***
 
     JPanel insertPanel = new JPanel();
+    insertPanel.setBorder(BorderFactory.createTitledBorder(
+        BorderFactory.createEtchedBorder(), "Insert"));
 
     insertNameText = new JTextField(15);
     insertGrade1Text = new JTextField(4);
@@ -109,7 +127,6 @@ public class GradingTool implements ActionListener {
     insertButton = new JButton("Add Student");
     insertButton.addActionListener(this);
 
-    insertPanel.add(new JLabel("Insert"));
     insertPanel.add(new JLabel(Student.printName));
     insertPanel.add(insertNameText);
     insertPanel.add(new JLabel(Student.printGrade1));
@@ -125,9 +142,12 @@ public class GradingTool implements ActionListener {
     // *** Create selectPanel ***
 
     JPanel selectPanel = new JPanel();
+    selectPanel.setBorder(BorderFactory.createTitledBorder(
+        BorderFactory.createEtchedBorder(), "Select"));
+    selectPanel.setPreferredSize(new Dimension(panel.getWidth(), 300));
 
     selectColumnCBoxModel = new DefaultComboBoxModel<String>(
-        Student.getColumns());
+        Student.getPrintColumns());
     selectColumnCBox = new JComboBox<String>(selectColumnCBoxModel);
     selectColumnCBox.setSelectedItem(Student.columnId);
 
@@ -143,25 +163,37 @@ public class GradingTool implements ActionListener {
 
     selectOutput = new JPanel();
     selectOutput.setLayout(new BoxLayout(selectOutput, BoxLayout.PAGE_AXIS));
-    updateSelected(g.selectAll(currentTable));
 
-    selectPanel.add(new JLabel("Select"));
-    selectPanel.add(new JLabel("Column:"));
-    selectPanel.add(selectColumnCBox);
-    selectPanel.add(new JLabel("Operator:"));
-    selectPanel.add(selectOperatorCBox);
-    selectPanel.add(new JLabel("Value:"));
-    selectPanel.add(selectValueText);
-    selectPanel.add(selectButton);
+    setCurrentTable();
+
+    JPanel selectPanel1 = new JPanel();
+    JPanel selectPanel2 = new JPanel();
+
+    selectPanel1.add(new JLabel("Column:"));
+    selectPanel1.add(selectColumnCBox);
+    selectPanel1.add(new JLabel("Operator:"));
+    selectPanel1.add(selectOperatorCBox);
+    selectPanel2.add(new JLabel("Value:"));
+    selectPanel2.add(selectValueText);
+    selectPanel2.add(selectButton);
+
+    selectPanel.add(selectPanel1);
+    selectPanel.add(selectPanel2);
     selectPanel.add(selectOutput);
 
     // *** Add panels to frame ***
 
-    panel.add(tablePanel);
-    panel.add(new JSeparator());
-    panel.add(insertPanel);
-    panel.add(new JSeparator());
-    panel.add(selectPanel);
+    JPanel mainPanel = new JPanel();
+    mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
+
+    mainPanel.add(tablePanel);
+    mainPanel.add(selectPanel);
+    mainPanel.add(insertPanel);
+
+    panel.add(mainPanel);
+    panel.add(statusLabel, BorderLayout.PAGE_END);
+
+    statusLabel.setText("Loaded database " + g.db);
 
     frame.add(panel);
     frame.pack();
@@ -171,110 +203,133 @@ public class GradingTool implements ActionListener {
   @Override
   public void actionPerformed(ActionEvent e) {
     if (e.getSource() == changeTableButton) {
-      this.currentTable = (String) changeTableCBox.getSelectedItem();
-      currentTableLabel.setText("Using table " + currentTable);
-      try {
-        updateSelected(g.selectAll(currentTable));
-      } catch (SQLException ex) {
-        System.err.println("Unable to select");
-      }
-      System.out.println("Now using table " + currentTable);
+      setCurrentTable((String) changeTableCBox.getSelectedItem());
 
     } else if (e.getSource() == dropTableButton) {
       String table = (String) changeTableCBox.getSelectedItem();
       try {
         g.dropTable(table);
-        System.out.println("Dropped table " + table);
+        statusLabel.setText("Dropped table " + table);
         changeTableCBoxModel.removeElement(table);
+        if (table == currentTable) {
+          setCurrentTable();
+        }
       } catch (SQLException ex) {
-        System.err.println("Failed to drop table " + table);
-        ex.printStackTrace();
+        statusLabel.setText("Failed to drop table " + table);
       }
-      System.out.println(this.currentTable);
 
     } else if (e.getSource() == newTableButton) {
-      String table = newTableText.getText();
-      if (!(table == null || table.isEmpty())) {
-        try {
+      try {
+        String table = newTableText.getText();
+        if (Arrays.asList(g.getTables()).contains(table)) {
+          statusLabel.setText("Table with name " + table + " already exists");
+        } else if (!(table == null || table.isEmpty())) {
+
           g.createTable(table);
+          statusLabel.setText("Created new table " + table);
           changeTableCBoxModel.addElement(table);
-        } catch (SQLException ex) {
-          System.err
-              .println("Failed to create table " + newTableText.getText());
-          ex.printStackTrace();
+
+        } else {
+          statusLabel.setText("Cannot create table with empty name");
         }
-      } else {
-        System.err.println("Cannot create table with empty name");
+      } catch (SQLException ex) {
+        statusLabel.setText("Failed to create table " + newTableText.getText());
       }
 
     } else if (e.getSource() == insertButton) {
-      String name = insertNameText.getText();
-      int grade1 = Integer.parseInt(insertGrade1Text.getText());
-      int grade2 = Integer.parseInt(insertGrade2Text.getText());
-      int grade3 = Integer.parseInt(insertGrade3Text.getText());
-      int gradeExam = Integer.parseInt(insertGradeExamText.getText());
+      try {
+        String name = insertNameText.getText();
 
-      if (grade1 > 0 && grade1 <= 100 && grade2 > 0 && grade2 <= 100
-        && grade3 > 0 && grade3 <= 100 && gradeExam > 0 && gradeExam <= 100) {
-        try {
+        if (name.isEmpty()) {
+          statusLabel.setText("Enter a name");
+          return;
+        }
+
+        int grade1 = Integer.parseInt(insertGrade1Text.getText());
+        int grade2 = Integer.parseInt(insertGrade2Text.getText());
+        int grade3 = Integer.parseInt(insertGrade3Text.getText());
+        int gradeExam = Integer.parseInt(insertGradeExamText.getText());
+
+        if (grade1 > 0 && grade1 <= Student.maxGrade && grade2 > 0
+          && grade2 <= Student.maxGrade && grade3 > 0
+          && grade3 <= Student.maxGrade && gradeExam > 0
+          && gradeExam <= Student.maxGrade) {
+
           g.insertStudent(currentTable, name, grade1, grade2, grade3, gradeExam);
-          System.out.println("Added new Student " + insertNameText.getText());
+          statusLabel.setText("Added new Student " + insertNameText.getText());
 
           insertNameText.setText("");
           insertGrade1Text.setText("");
           insertGrade2Text.setText("");
           insertGrade3Text.setText("");
           insertGradeExamText.setText("");
-        } catch (NumberFormatException ex) {
-          System.err.println("Incorrect number format");
-        } catch (SQLException ex) {
-          System.err.println("Failed to insert student");
-          ex.printStackTrace();
+
+        } else {
+          statusLabel.setText("Enter grade between 0 and " + Student.maxGrade);
         }
-      } else {
-        System.err.println("Enter grade between 0 and 100");
+      } catch (NumberFormatException ex) {
+        statusLabel.setText("Incorrect number format");
+      } catch (SQLException ex) {
+        statusLabel.setText("Failed to insert student");
       }
 
     } else if (e.getSource() == selectButton) {
-      int type;
-      switch ((String) selectColumnCBox.getSelectedItem()) {
-        case Student.columnId:
-        case Student.columnGrade1:
-        case Student.columnGrade2:
-        case Student.columnGrade3:
-        case Student.columnGradeExam:
-          type = java.sql.Types.INTEGER;
-          break;
-        case Student.columnName:
-        default:
-          type = java.sql.Types.VARCHAR;
-          break;
-      }
+      String dbColumn = Student
+          .getColumnFromPrintColumn((String) selectColumnCBox.getSelectedItem());
+
+      int type = Student.getSQLType(dbColumn);
 
       Student[] selected = new Student[] {};
       try {
         if (type == java.sql.Types.INTEGER) {
-          selected = g.selectStudent(currentTable,
-              (String) selectColumnCBox.getSelectedItem(),
+          selected = g.selectStudent(currentTable, dbColumn,
               Integer.parseInt(selectValueText.getText()), type,
               (String) selectOperatorCBox.getSelectedItem());
         } else if (type == java.sql.Types.VARCHAR) {
-          selected = g.selectStudent(currentTable,
-              (String) selectColumnCBox.getSelectedItem(),
+          selected = g.selectStudent(currentTable, dbColumn,
               selectValueText.getText(), type,
               (String) selectOperatorCBox.getSelectedItem());
         }
         updateSelected(selected);
       } catch (SQLException ex) {
-        System.err.println("Unable to select");
-        ex.printStackTrace();
+        statusLabel.setText("Unable to select");
       }
     }
   }
 
+  public void setCurrentTable() {
+    try {
+      setCurrentTable(changeTableCBoxModel.getElementAt(0));
+    } catch (NullPointerException ex) {
+      clearCurrentTable();
+    }
+  }
+
+  public void setCurrentTable(String newTable) {
+    currentTable = newTable;
+    try {
+      updateSelected(g.selectAll(currentTable));
+    } catch (SQLException e) {
+      clearSelected();
+    }
+    currentTableLabel.setText("Using table " + currentTable);
+    statusLabel.setText("Now using table " + currentTable);
+  }
+
+  public void clearCurrentTable() {
+    clearSelected();
+    currentTableLabel.setText("No table");
+    statusLabel.setText("No table");
+  }
+
+  public void clearSelected() {
+    selectOutput.removeAll();
+    selectOutput.validate();
+  }
+
   public void updateSelected(Student[] selected) {
     try {
-      selectOutput.removeAll();
+      clearSelected();
 
       // convert array of students to [][] of student data
       List<Object[]> list = new ArrayList<Object[]>();
@@ -291,8 +346,8 @@ public class GradingTool implements ActionListener {
       table.setFillsViewportHeight(true);
       JScrollPane scrollPane = new JScrollPane(table);
       selectOutput.add(scrollPane);
-      selectOutput.validate();
     } catch (NullPointerException ex) {
     }
+    selectOutput.validate();
   }
 }
