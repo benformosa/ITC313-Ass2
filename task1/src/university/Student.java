@@ -13,6 +13,7 @@ public class Student {
   public static final String columnGradeExam = "gradeExam";
   public static final String columnId = "id";
   public static final String columnName = "name";
+  public static final String columnGradeFinal = "gradeFinal";
 
   public static final String printGrade1 = "Assignment 1";
   public static final String printGrade2 = "Assignment 2";
@@ -42,6 +43,7 @@ public class Student {
       case printName:
         return columnName;
       case printGradeFinal:
+        return columnGradeFinal;
       default:
         return null;
     }
@@ -54,6 +56,7 @@ public class Student {
       case Student.columnGrade2:
       case Student.columnGrade3:
       case Student.columnGradeExam:
+      case Student.columnGradeFinal:
         return java.sql.Types.INTEGER;
       case Student.columnName:
       default:
@@ -86,10 +89,15 @@ public class Student {
     this.gradeExam = gradeExam;
   }
 
-  public int getFinalGrade() {
+  public static int getFinalGrade(int grade1, int grade2, int grade3,
+      int gradeExam) {
     return (grade1 * grade1Weight + grade2 * grade2Weight + grade3
       * grade3Weight + gradeExam * gradeExamWeight)
       / (grade1Weight + grade2Weight + grade3Weight + gradeExamWeight);
+  }
+
+  public int getFinalGrade() {
+    return getFinalGrade(this.grade1, this.grade2, this.grade3, this.gradeExam);
   }
 
   public Object[] toArray() {

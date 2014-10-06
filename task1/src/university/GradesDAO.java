@@ -40,6 +40,7 @@ public class GradesDAO {
       + Student.columnName + " varchar(40) not null, " + Student.columnGrade1
       + " integer not null, " + Student.columnGrade2 + " integer not null, "
       + Student.columnGrade3 + " integer not null," + Student.columnGradeExam
+      + " integer not null, " + Student.columnGradeFinal
       + " integer not null, " + "primary key (" + Student.columnId + "))";
     runUpdate(query);
 
@@ -77,13 +78,15 @@ public class GradesDAO {
       s = connection.prepareStatement("insert into " + tableName + " ("
         + Student.columnName + "," + Student.columnGrade1 + ","
         + Student.columnGrade2 + "," + Student.columnGrade3 + ","
-        + Student.columnGradeExam + ") " + "values (?, ?, ?, ?, ?)");
+        + Student.columnGradeExam + "," + Student.columnGradeFinal + ") "
+        + "values (?, ?, ?, ?, ?, ?)");
 
       s.setString(1, name);
       s.setInt(2, grade1);
       s.setInt(3, grade2);
       s.setInt(4, grade3);
       s.setInt(5, gradeExam);
+      s.setInt(6, Student.getFinalGrade(grade1, grade2, grade3, gradeExam));
       s.executeUpdate();
     } catch (SQLException e) {
       e.printStackTrace();
@@ -172,7 +175,7 @@ public class GradesDAO {
    */
   public Student[] selectStudentByGrade(String tableName, int grade, int value,
       String operator) throws SQLException {
-    if (grade >= 1 && grade <= 4) {
+    if (grade >= 1 && grade <= 5) {
       String which = null;
       switch (grade) {
         case 1:
@@ -186,6 +189,9 @@ public class GradesDAO {
           break;
         case 4:
           which = Student.columnGradeExam;
+          break;
+        case 5:
+          which = Student.columnGradeFinal;
           break;
       }
       return selectStudent(tableName, which, value, java.sql.Types.INTEGER,
