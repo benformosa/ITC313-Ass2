@@ -1,13 +1,16 @@
 package speed;
 
-import javax.swing.SwingWorker;
+public interface Speedometer {
+  public void speedDown();
 
-public class Speedometer extends SwingWorker<Void, Void> {
+  public void speedUp();
 
-	@Override
-	protected Void doInBackground() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  public int getSpeed();
+
+  public void setSpeed(int speed);
+
+  public int getUpKey();
+
+  public int getDownKey();
 
 }
