@@ -1,15 +1,13 @@
 package speed;
 
 import java.awt.GridLayout;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
 
 @SuppressWarnings("serial")
-public class MultiSpeedFrame extends JFrame implements FocusListener {
+public class MultiSpeedFrame extends JFrame {
   private SpeedometerPanel[] speedometers;
 
   public static void main(String[] args) {
@@ -47,7 +45,6 @@ public class MultiSpeedFrame extends JFrame implements FocusListener {
     }
     this.pack();
     this.setVisible(true);
-    this.addFocusListener(this);
     this.requestFocus();
   }
 
@@ -69,15 +66,5 @@ public class MultiSpeedFrame extends JFrame implements FocusListener {
         }
       }
     }
-  }
-
-  @Override
-  public void focusGained(FocusEvent e) {
-
-  }
-
-  @Override
-  public void focusLost(FocusEvent e) {
-    this.requestFocus();
   }
 }

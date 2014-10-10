@@ -1,8 +1,8 @@
-<project name="speed.MultiSpeed" basedir="." default="main">
+<project name="speed.MultiSpeedFrame" basedir="." default="main">
   <property name="src.dir" value="src" />
   <property name="build.dir" value="bin" />
   <property name="lib.dir" value="/usr/share/java" />
-  <property name="main-class"  value="speed.MultiSpeed" />
+  <property name="main-class"  value="speed.MultiSpeedFrame" />
 
   <path id="classpath">
   </path>

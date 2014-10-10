@@ -1,18 +1,14 @@
 package speed;
 
 import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 @SuppressWarnings("serial")
-public class SpeedometerPanel extends JPanel implements Speedometer,
-    ActionListener {
+public class SpeedometerPanel extends JPanel implements Speedometer {
 
   public static void main(String args[]) {
     EventQueue.invokeLater(new Runnable() {
@@ -30,11 +26,10 @@ public class SpeedometerPanel extends JPanel implements Speedometer,
 
   public char downKey;
   public int speed = 0;
-  public int maxSpeed = 200;
+  public int maxSpeed = 100;
   public int minSpeed = 0;
-  private JButton speedDownButton;
+
   private JLabel speedLabel;
-  private JButton speedUpButton;
   private JProgressBar speedBar;
   public char upKey;
 
@@ -42,29 +37,16 @@ public class SpeedometerPanel extends JPanel implements Speedometer,
     this.upKey = upKey;
     this.downKey = downKey;
 
-    speedLabel = new JLabel(Integer.toString(this.getSpeed()));
-    speedUpButton = new JButton("↑");
-    speedUpButton.addActionListener(this);
-    speedDownButton = new JButton("↓");
-    speedDownButton.addActionListener(this);
+    speedLabel = new JLabel(speed + "/" + maxSpeed);
+
     speedBar = new JProgressBar(0, maxSpeed);
     speedBar.setStringPainted(true);
     speedBar.setValue(speed);
 
     this.add(speedLabel);
-    this.add(speedUpButton);
-    this.add(speedDownButton);
+
     this.add(speedBar);
     this.add(new JLabel("Up: " + upKey + " Down: " + downKey));
-  }
-
-  @Override
-  public void actionPerformed(ActionEvent e) {
-    if (e.getSource() == speedUpButton) {
-      speedUp();
-    } else if (e.getSource() == speedDownButton) {
-      speedDown();
-    }
   }
 
   @Override
@@ -90,7 +72,7 @@ public class SpeedometerPanel extends JPanel implements Speedometer,
   private synchronized void speedChange(int i) {
     if (this.speed + i <= maxSpeed & this.speed + i >= minSpeed) {
       this.speed += i;
-      speedLabel.setText(Integer.toString(this.getSpeed()));
+      speedLabel.setText(speed + "/" + maxSpeed);
       speedBar.setValue(speed);
       System.out.println(this.toString());
     }
