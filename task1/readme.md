@@ -18,7 +18,7 @@ Grades are stored with one row per student, with one table per subject.
 
 # Pre-requisites
 
-I tested using OpenJDP 1.7 and MySQL 14.14 on Ubuntu:
+I tested using OpenJDK 1.7 and MySQL 14.14 on Ubuntu:
 
 ```
 $ java -version
