@@ -23,7 +23,8 @@ public class MultiSpeedFrame extends JFrame implements FocusListener {
 
   public MultiSpeedFrame() {
     this.setLayout(new GridLayout(2, 0, 10, 10));
-    speedometers = MultiSpeedometerFactory.createSpeedometerPanels();
+    char keys[][] = { { 'a', 'z' }, { 's', 'x' }, { 'd', 'c' }, { 'f', 'v' } };
+    speedometers = MultiSpeedometerFactory.createSpeedometerPanels(keys);
 
     this.addKeyListener(new KeyListener() {
       @Override
@@ -60,10 +61,10 @@ public class MultiSpeedFrame extends JFrame implements FocusListener {
     @Override
     public void run() {
       for (SpeedometerPanel s : speedometers) {
-        if (e.getKeyCode() == s.getUpKey()) {
+        if (e.getKeyChar() == s.getUpKey()) {
           s.speedUp();
         }
-        if (e.getKeyCode() == s.getDownKey()) {
+        if (e.getKeyChar() == s.getDownKey()) {
           s.speedDown();
         }
       }

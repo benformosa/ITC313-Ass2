@@ -1,6 +1,9 @@
 package speed;
 
 public interface Speedometer {
+  char keyUp = 'a';
+  char keyDown = 'z';
+
   public void speedDown();
 
   public void speedUp();
@@ -9,8 +12,8 @@ public interface Speedometer {
 
   public void setSpeed(int speed);
 
-  public int getUpKey();
+  public char getUpKey();
 
-  public int getDownKey();
+  public char getDownKey();
 
 }

@@ -3,7 +3,6 @@ package speed;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,22 +21,24 @@ public class SpeedometerPanel extends JPanel implements Speedometer,
       public void run() {
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new SpeedometerPanel(KeyEvent.VK_A, KeyEvent.VK_Z));
+        frame.add(new SpeedometerPanel('a', 'z'));
         frame.pack();
         frame.setVisible(true);
       }
     });
   }
 
-  public int downKey;
+  public char downKey;
   public int speed = 0;
+  public int maxSpeed = 200;
+  public int minSpeed = 0;
   private JButton speedDownButton;
   private JLabel speedLabel;
   private JButton speedUpButton;
   private JProgressBar speedBar;
-  public int upKey;
+  public char upKey;
 
-  public SpeedometerPanel(int upKey, int downKey) {
+  public SpeedometerPanel(char upKey, char downKey) {
     this.upKey = upKey;
     this.downKey = downKey;
 
@@ -46,7 +47,7 @@ public class SpeedometerPanel extends JPanel implements Speedometer,
     speedUpButton.addActionListener(this);
     speedDownButton = new JButton("↓");
     speedDownButton.addActionListener(this);
-    speedBar = new JProgressBar(-100, 100);
+    speedBar = new JProgressBar(0, maxSpeed);
     speedBar.setStringPainted(true);
     speedBar.setValue(speed);
 
@@ -54,6 +55,7 @@ public class SpeedometerPanel extends JPanel implements Speedometer,
     this.add(speedUpButton);
     this.add(speedDownButton);
     this.add(speedBar);
+    this.add(new JLabel("Up: " + upKey + " Down: " + downKey));
   }
 
   @Override
@@ -66,7 +68,7 @@ public class SpeedometerPanel extends JPanel implements Speedometer,
   }
 
   @Override
-  public int getDownKey() {
+  public char getDownKey() {
     return downKey;
   }
 
@@ -76,7 +78,7 @@ public class SpeedometerPanel extends JPanel implements Speedometer,
   }
 
   @Override
-  public int getUpKey() {
+  public char getUpKey() {
     return upKey;
   }
 
@@ -86,10 +88,12 @@ public class SpeedometerPanel extends JPanel implements Speedometer,
   }
 
   private synchronized void speedChange(int i) {
-    this.speed += i;
-    speedLabel.setText(Integer.toString(this.getSpeed()));
-    speedBar.setValue(speed);
-    System.out.println(speed);
+    if (this.speed + i <= maxSpeed & this.speed + i >= minSpeed) {
+      this.speed += i;
+      speedLabel.setText(Integer.toString(this.getSpeed()));
+      speedBar.setValue(speed);
+      System.out.println(this.toString());
+    }
   }
 
   @Override
@@ -100,5 +104,9 @@ public class SpeedometerPanel extends JPanel implements Speedometer,
   @Override
   public synchronized void speedUp() {
     this.speedChange(1);
+  }
+
+  public String toString() {
+    return upKey + "," + downKey + ":" + speed;
   }
 }

@@ -1,22 +1,22 @@
 package speed;
 
 public class AbstractSpeedometer implements Speedometer {
-  public int downKey;
+  public char downKey;
   public int speed = 0;
-  public int upKey;
+  public char upKey;
 
-  public AbstractSpeedometer(int upKey, int downKey) {
+  public AbstractSpeedometer(char upKey, char downKey) {
     this.upKey = upKey;
     this.downKey = downKey;
   }
 
-  public AbstractSpeedometer(int startSpeed, int upKey, int downKey) {
+  public AbstractSpeedometer(int startSpeed, char upKey, char downKey) {
     this(upKey, downKey);
     this.speed = startSpeed;
   }
 
   @Override
-  public int getDownKey() {
+  public char getDownKey() {
     return downKey;
   }
 
@@ -26,7 +26,7 @@ public class AbstractSpeedometer implements Speedometer {
   }
 
   @Override
-  public int getUpKey() {
+  public char getUpKey() {
     return upKey;
   }
 
